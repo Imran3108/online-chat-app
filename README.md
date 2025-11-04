@@ -1,4 +1,4 @@
-# Online Chat App – Deployment Guide (AWS EC2 + Docker Compose)
+# Online Chat App – Deployment Guide (AWS EC2 + Docker Compose) -
 
 This guide walks you through deploying the Socket.IO chat app (Node/Express backend, React frontend, MongoDB Atlas) on an Ubuntu AWS EC2 instance using Docker Compose. No container registry is required; images are built directly on EC2.
 
