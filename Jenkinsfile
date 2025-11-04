@@ -24,20 +24,15 @@ pipeline {
             steps {
                 echo 'Deploying Online Chat App on AWS EC2...'
 
-                sh '''
-                    ssh -o StrictHostKeyChecking=no -i ${SSH_KEY_PATH} ${EC2_HOST} << 'EOF'
-                        echo "Navigating to project directory..."
-                        cd ~/online-chat-app
+                // Run remote Linux commands from Windows Jenkins using Git Bash
+                bat """
+                echo Connecting to AWS EC2 instance...
 
-                        echo "Pulling latest code from Git..."
-                        git pull
+                "C:\\Program Files\\Git\\bin\\bash.exe" -c "ssh -o StrictHostKeyChecking=no -i '${SSH_KEY_PATH}' ${EC2_HOST} \\
+                'cd ~/online-chat-app && git pull && bash scripts/run_on_ec2.sh'"
 
-                        echo "Running deployment script..."
-                        bash scripts/run_on_ec2.sh
-
-                        echo "Deployment successful ✅"
-                    EOF
-                '''
+                echo Deployment completed on EC2 ✅
+                """
             }
         }
     }
