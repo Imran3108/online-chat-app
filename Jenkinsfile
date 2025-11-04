@@ -2,12 +2,24 @@ pipeline {
     agent any
 
     environment {
-        // Replace with your actual instance details
         EC2_HOST = 'ec2-user@35.172.48.105'
-        SSH_KEY_PATH = "C:/ProgramData/Jenkins/.jenkins/project.pem"  // Path to your private key on Jenkins server
+        SSH_KEY_PATH = "C:/ProgramData/Jenkins/.jenkins/project.pem"  // Path to private key on Jenkins server
+    }
+
+    triggers {
+        // Poll GitHub every 5 minutes for new commits
+        pollSCM('H/5 * * * *')
     }
 
     stages {
+        stage('Checkout Code') {
+            steps {
+                echo 'Checking for new commits on GitHub...'
+                git branch: 'main',
+                    url: 'https://github.com/Imran3108/online-chat-app.git'
+            }
+        }
+
         stage('Deploy to AWS EC2') {
             steps {
                 echo 'Deploying Online Chat App on AWS EC2...'
