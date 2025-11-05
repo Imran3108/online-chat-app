@@ -32,7 +32,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-900 to-blue-900">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
         <div className="mb-4">
-          <div className="text-2xl font-semibold">Online Chat</div>
+          <div className="text-2xl font-semibold">Online Chat By Imran</div>
           <div className="text-sm text-white/70">{mode === 'login' ? 'Sign in to continue' : 'Create your account'}</div>
         </div>
         <form onSubmit={submit} className="space-y-4">
