@@ -9,7 +9,7 @@ pipeline {
         GIT_BRANCH = 'main'
 
         // --- SSH Key Path (on Jenkins Windows host) ---
-        SSH_KEY_PATH = 'D:\key\chat.ppk'
+        SSH_KEY_PATH = 'D:\\key\\chat.ppk'
 
         // --- Full path to PuTTY's plink.exe ---
         PLINK_PATH = 'C:\\Program Files\\PuTTY\\plink.exe'
