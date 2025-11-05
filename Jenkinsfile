@@ -2,36 +2,43 @@ pipeline {
     agent any
 
     environment {
-        EC2_HOST = 'ec2-user@35.172.48.105'
-        SSH_KEY_PATH = "C:/ProgramData/Jenkins/.jenkins/project.pem"  // Path to private key on Jenkins server
+        // --- EC2 Details ---
+        EC2_USER = 'ubuntu'
+        EC2_HOST = '35.172.48.105' // your EC2 Public IP or DNS
+        PROJECT_DIR = '/home/ubuntu/online-chat-app'
+        GIT_BRANCH = 'main'
+
+        // --- SSH Key Path (on Jenkins Windows host) ---
+        SSH_KEY_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\chat-app.ppk'
+
+        // --- Full path to PuTTY's plink.exe ---
+        PLINK_PATH = 'C:\\Program Files\\PuTTY\\plink.exe'
     }
 
     triggers {
-        // Poll GitHub every 5 minutes for new commits
-        pollSCM('H/5 * * * *')
+        // Auto trigger every git commit (or every minute fallback)
+        pollSCM('* * * * *')
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                echo 'Checking for new commits on GitHub...'
-                git branch: 'main',
-                    url: 'https://github.com/Imran3108/online-chat-app.git'
+                echo '📦 Pulling latest code from GitHub...'
+                checkout scm
             }
         }
 
-        stage('Deploy to AWS EC2') {
+        stage('Deploy to EC2 via SSH') {
             steps {
-                echo 'Deploying Online Chat App on AWS EC2...'
+                echo '🚀 Deploying app to EC2 via SSH...'
 
-                // Run remote Linux commands from Windows Jenkins using Git Bash
                 bat """
-                echo Connecting to AWS EC2 instance...
+                    echo Auto-caching EC2 host key (if not already cached)...
+                    echo y | "${PLINK_PATH}" -i "${SSH_KEY_PATH}" ${EC2_USER}@${EC2_HOST} exit
 
-                "C:\\Program Files\\Git\\bin\\bash.exe" -c "ssh -o StrictHostKeyChecking=no -i '${SSH_KEY_PATH}' ${EC2_HOST} \\
-                'cd ~/online-chat-app && git pull && bash scripts/run_on_ec2.sh'"
-
-                echo Deployment completed on EC2 ✅
+                    echo Connecting and deploying to EC2...
+                    "${PLINK_PATH}" -i "${SSH_KEY_PATH}" -batch ${EC2_USER}@${EC2_HOST} ^
+                    "cd ${PROJECT_DIR} && git pull origin ${GIT_BRANCH} && bash scripts/run_on_ec2.sh"
                 """
             }
         }
@@ -39,7 +46,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ AWS deployment completed successfully!'
+            echo '✅ Deployment completed successfully on EC2!'
         }
         failure {
             echo '❌ Deployment failed — check Jenkins logs for details.'
